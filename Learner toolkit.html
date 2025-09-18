@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ Công Cụ Học Viên - Build Talents</title>
+    
+    <!-- React Libraries -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Babel for JSX Transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Match app background */
+            color: #E5E7EB;
+        }
+        #root {
+            height: 100vh;
+        }
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #1F2937;
+            color: #9CA3AF;
+            font-size: 14px;
+            border-top: 1px solid #374151;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+        /* Custom styling for range input */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3B82F6;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-top: -6px;
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3B82F6;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <div class="footer">
+        Học Liệu cho đào tạo. Bản quyền thuộc Rosie Đào Hạnh Giang CEO Build Talents.
+    </div>
+
+    <script type="text/babel">
+        // --- SVG Icons ---
+        const CheckIcon = () => <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>;
+        const PlusIcon = () => <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
+
+        // --- Data ---
+        const caseStudies = {
+            performance: { title: "Quản lý Hiệu suất", scenario: "Một nhân viên liên tục không đạt chỉ tiêu (KPI) trong tháng.", firefighter: "Triệu tập một cuộc họp khẩn, chỉ ra các lỗi sai của nhân viên, yêu cầu họ 'cố gắng hơn' và báo cáo hàng ngày. Tập trung vào việc dập tắt 'ngọn lửa' hiệu suất kém ngay lập tức.", architect: "Sử dụng buổi họp 1-1, dùng mô hình GROW để tìm hiểu nguyên nhân gốc rễ. Liệu đây là vấn đề kỹ năng, động lực hay quy trình? Cùng nhân viên xây dựng một kế hoạch phát triển cá nhân, thiết kế lại quy trình hỗ trợ nếu cần. Tập trung vào việc xây dựng 'nền móng' năng lực bền vững." },
+            problem_solving: { title: "Giải quyết Vấn đề", scenario: "Đội của bạn liên tục gặp một lỗi sai giống nhau khi xử lý hồ sơ bồi thường cho khách hàng.", firefighter: "Trực tiếp nhảy vào sửa lỗi cho từng trường hợp, làm việc ngoài giờ để 'cứu' các hồ sơ sai. Gửi một email nhắc nhở chung chung cho cả đội. Vấn đề tạm thời được giải quyết nhưng sẽ lặp lại.", architect: "Tổ chức một buổi phân tích ngắn gọn, sử dụng Biểu đồ Xương cá để cả đội cùng tìm ra nguyên nhân (do quy trình, do công cụ, do đào tạo?). Thiết kế một checklist mới hoặc một buổi đào tạo ngắn để 'vá lỗ hổng' trong hệ thống, đảm bảo lỗi không tái diễn." },
+            team_development: { title: "Phát triển Đội ngũ", scenario: "Công ty sắp triển khai một hệ thống phần mềm mới.", firefighter: "Chờ đến sát ngày triển khai, khi nhân viên bắt đầu gặp lỗi và phàn nàn, mới vội vã tổ chức một buổi đào tạo 'chữa cháy'. Sự tiếp thu thấp và tinh thần phản kháng cao.", architect: "Chủ động lập kế hoạch từ sớm. Phân tích các kỹ năng cần thiết, xác định ai là người cần đào tạo sâu, ai chỉ cần hướng dẫn cơ bản. Thiết kế một lộ trình học tập nhỏ giọt (micro-learning) và chỉ định 'đại sứ thay đổi' trong nhóm để hỗ trợ đồng nghiệp. Xây dựng một 'cấu trúc' cho sự thay đổi." },
+            meetings: { title: "Vận hành Cuọp họp", scenario: "Chuẩn bị cho cuộc họp đánh giá kết quả hàng tuần của đội.", firefighter: "Chủ đề cuộc họp xoay quanh các 'vấn đề nóng' trong ngày: khách hàng A đang phàn nàn, hợp đồng B đang bị trễ. Cuộc họp kéo dài, không có kết luận rõ ràng, mọi người rời đi với cảm giác mệt mỏi.", architect: "Gửi trước một agenda rõ ràng, tập trung vào việc rà soát tiến độ so với mục tiêu (OKR) và thảo luận các cải tiến quy trình (PDCA). Các 'vấn đề nóng' được yêu cầu xử lý trước hoặc đưa vào một khung thời gian riêng. Cuộc họp có mục tiêu, đúng giờ và tạo ra các hành động cụ thể cho tương lai." }
+        };
+
+        const emotions = [
+            { emoji: '😊', label: 'Hào hứng' }, { emoji: '🙂', label: 'Bình thường' }, { emoji: '😐', label: 'Hơi mệt' }, { emoji: '😟', label: 'Lo lắng' }, { emoji: '😠', label: 'Căng thẳng' },
+        ];
+
+        // --- Main Component ---
+        const LearnerToolkit = () => {
+            const tools = [
+                "Check-in Cảm xúc", "Điểm Xuất Phát", "Ma Trận Tập Trung", "WBS Builder", "Phân Tích 5 Whys", "La Bàn SLII®", "Checklist Phản Hồi SBI", "Điều Lệ Nhóm", "Kế hoạch Hành động 30-60-90",
+            ];
+            const [activeTool, setActiveTool] = React.useState(tools[0]);
+            
+            // --- State for each tool ---
+            const [assessment, setAssessment] = React.useState(5);
+            const [activeCase, setActiveCase] = React.useState(Object.keys(caseStudies)[0]);
+            const [matrixTasks, setMatrixTasks] = React.useState({
+                new: [{id: 1, text: "Chuẩn bị báo cáo quý"}, {id: 2, text: "Trả lời email khách hàng X"}],
+                q1: [], q2: [], q3: [], q4: [],
+            });
+            const [newTask, setNewTask] = React.useState("");
+            const [wbs, setWbs] = React.useState({ objective: "", deliverables: [{ id: 1, title: "", packages: [""] }] });
+            const [fiveWhys, setFiveWhys] = React.useState(Array(5).fill(""));
+            const [problem, setProblem] = React.useState("");
+            const [sl2, setSl2] = React.useState({ competence: 2, commitment: 2 });
+            const [sbi, setSbi] = React.useState({ situation: "", behavior: "", impact: "" });
+            const [teamCharter, setTeamCharter] = React.useState({ purpose: "", roles: "", values: "", communication: "", conflict: "" });
+            const [actionPlan, setActionPlan] = React.useState({
+                30: { goal: "", actions: "", metric: "" },
+                60: { goal: "", actions: "", metric: "" },
+                90: { goal: "", actions: "", metric: "" },
+            });
+            const [emotionsLog, setEmotionsLog] = React.useState([]);
+
+            // --- Handlers ---
+            const handleAddTask = () => {
+                if(newTask.trim() !== "") {
+                    setMatrixTasks(prev => ({...prev, new: [...prev.new, {id: Date.now(), text: newTask}]}));
+                    setNewTask("");
+                }
+            };
+             const moveTask = (e, to) => {
+                e.preventDefault();
+                const taskId = parseInt(e.dataTransfer.getData("taskId"));
+                const from = e.dataTransfer.getData("from");
+                if (!taskId || !from) return;
+                
+                const taskToMove = matrixTasks[from].find(t => t.id === taskId);
+
+                if (taskToMove) {
+                    // Prevent adding to the same list
+                    if (from === to) return;
+
+                    setMatrixTasks(prev => ({
+                        ...prev,
+                        [from]: prev[from].filter(t => t.id !== taskId),
+                        [to]: [...prev[to], taskToMove]
+                    }));
+                }
+            };
+            const handleDragStart = (e, task, from) => {
+                e.dataTransfer.setData("taskId", task.id.toString());
+                e.dataTransfer.setData("from", from);
+            };
+
+            const handleWbsChange = (field, value, deliverableId = null, packageIndex = null) => {
+                if (field === 'objective') setWbs(prev => ({ ...prev, objective: value }));
+                else {
+                    const newDeliverables = wbs.deliverables.map(d => {
+                        if (d.id === deliverableId) {
+                            if (field === 'deliverableTitle') return { ...d, title: value };
+                            if (field === 'package') {
+                                const newPackages = [...d.packages];
+                                newPackages[packageIndex] = value;
+                                return { ...d, packages: newPackages };
+                            }
+                        }
+                        return d;
+                    });
+                    setWbs(prev => ({ ...prev, deliverables: newDeliverables }));
+                }
+            };
+            const addDeliverable = () => setWbs(prev => ({ ...prev, deliverables: [...prev.deliverables, { id: Date.now(), title: "", packages: [""] }] }));
+            const addPackage = (deliverableId) => {
+                const newDeliverables = wbs.deliverables.map(d => d.id === deliverableId ? { ...d, packages: [...d.packages, ""] } : d);
+                setWbs(prev => ({ ...prev, deliverables: newDeliverables }));
+            };
+            const getSLIIStyle = (competence, commitment) => {
+                if (competence <= 2 && commitment >= 3) return { level: "D1", name: "Người mới bắt đầu đầy nhiệt huyết", style: "S1 - Chỉ đạo", desc: "Cung cấp hướng dẫn cụ thể, giám sát chặt chẽ. Tập trung vào 'cách làm'." };
+                if (competence <= 2 && commitment <= 2) return { level: "D2", name: "Người học vỡ mộng", style: "S2 - Huấn luyện", desc: "Vừa hướng dẫn, vừa giải thích 'tại sao', lắng nghe và động viên." };
+                if (competence >= 3 && commitment <= 2) return { level: "D3", name: "Người có năng lực nhưng thận trọng", style: "S3 - Hỗ trợ", desc: "Hợp tác, lắng nghe và tạo điều kiện để nhân viên tự ra quyết định." };
+                if (competence >= 3 && commitment >= 3) return { level: "D4", name: "Người đạt thành tích tự chủ", style: "S4 - Ủy quyền", desc: "Giao phó trách nhiệm và quyền hạn, tin tưởng vào kết quả." };
+                return { level: "?", name: "Chưa xác định", style: "...", desc: "Hãy điều chỉnh thanh trượt để chẩn đoán." };
+            };
+            const handleWhyChange = (index, value) => {
+                const newWhys = [...fiveWhys]; newWhys[index] = value; setFiveWhys(newWhys);
+            };
+            const handleSbiChange = (field, value) => setSbi(prev => ({ ...prev, [field]: value }));
+            const handleCharterChange = (field, value) => setTeamCharter(prev => ({ ...prev, [field]: value }));
+            const handlePlanChange = (period, field, value) => {
+                setActionPlan(prev => ({ ...prev, [period]: { ...prev[period], [field]: value } }));
+            };
+            const handleEmotionCheckIn = (emotion) => {
+                const newLogEntry = { ...emotion, timestamp: new Date().toLocaleString('vi-VN') };
+                setEmotionsLog(prev => [newLogEntry, ...prev].slice(0, 5));
+            };
+            
+            const renderActiveTool = () => {
+                const sl2Result = getSLIIStyle(sl2.competence, sl2.commitment);
+                switch(activeTool) {
+                    case "Check-in Cảm xúc":
+                        return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Check-in Cảm xúc</h3>
+                                <p style={styles.paragraph}>Dừng lại một chút để nhận diện cảm xúc của bạn ngay lúc này. Việc này giúp bạn hiểu rõ hơn về trạng thái nội tâm của mình, từ đó có những quyết định và hành động sáng suốt hơn trong ngày.</p>
+                                <h4 style={styles.subHeader}>Bây giờ, bạn cảm thấy thế nào?</h4>
+                                <div style={styles.emotionSelector}>
+                                    {emotions.map(emotion => (
+                                        <button key={emotion.label} onClick={() => handleEmotionCheckIn(emotion)} style={styles.emotionButton}>
+                                            <span style={styles.emotionEmoji}>{emotion.emoji}</span>
+                                            <span>{emotion.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                                {emotionsLog.length > 0 && (
+                                    <div style={styles.emotionLogContainer}>
+                                        <h4 style={styles.subHeader}>Nhật ký gần đây</h4>
+                                        {emotionsLog.map((log, index) => (
+                                            <div key={index} style={styles.emotionLogItem}>
+                                                <span>Bạn đã cảm thấy <strong>{log.label} {log.emoji}</strong></span>
+                                                <span style={styles.emotionLogTimestamp}>{log.timestamp}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    case "Điểm Xuất Phát":
+                        const currentCase = caseStudies[activeCase];
+                        return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Tự đánh giá: Lính cứu hỏa vs. Kiến trúc sư</h3>
+                                <p style={styles.paragraph}>Mọi nhà quản lý đều có cả hai vai trò này. Điều quan trọng là nhận thức được bạn đang dành bao nhiêu thời gian và năng lượng cho mỗi vai trò. Hãy dùng thanh trượt dưới đây để tự đánh giá phong cách làm việc chủ đạo của bạn trong tuần qua.</p>
+                                <div style={styles.sliderContainer}>
+                                    <span style={styles.sliderLabel}>Lính cứu hỏa (Phản ứng)</span>
+                                    <input type="range" min="1" max="10" value={assessment} onChange={(e) => setAssessment(e.target.value)} style={styles.slider}/>
+                                    <span style={styles.sliderLabel}>Kiến trúc sư (Chủ động)</span>
+                                </div>
+                                <div style={styles.sliderValue}>Giá trị của bạn: {assessment}</div>
+                                <div style={styles.caseStudySection}>
+                                     <h4 style={styles.caseStudyHeader}>Khám phá qua Case Study</h4>
+                                     <p style={styles.paragraph}>Khái niệm này có thể khá trừu tượng. Hãy xem cách hai tư duy này thể hiện qua các tình huống quản lý thực tế.</p>
+                                     <div style={styles.caseStudyTabs}>
+                                        {Object.keys(caseStudies).map(key => (
+                                            <button key={key} onClick={() => setActiveCase(key)} style={activeCase === key ? styles.caseStudyTabActive : styles.caseStudyTab}>{caseStudies[key].title}</button>
+                                        ))}
+                                     </div>
+                                     <div style={styles.caseStudyContent}>
+                                         <p style={styles.caseStudyScenario}><strong>Tình huống:</strong> {currentCase.scenario}</p>
+                                         <div style={styles.caseStudyColumns}>
+                                             <div style={styles.caseStudyColumn}><h5 style={styles.columnTitle}>Tư duy Lính cứu hỏa</h5><p style={styles.paragraph}>{currentCase.firefighter}</p></div>
+                                             <div style={styles.caseStudyColumn}><h5 style={styles.columnTitle}>Tư duy Kiến trúc sư</h5><p style={styles.paragraph}>{currentCase.architect}</p></div>
+                                         </div>
+                                     </div>
+                                </div>
+                            </div>
+                        );
+                    case "Ma Trận Tập Trung":
+                        return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Ma Trận Eisenhower: Sắp xếp ưu tiên</h3>
+                                <p style={styles.paragraph}>Công cụ này giúp bạn phân loại công việc dựa trên hai tiêu chí: Mức độ khẩn cấp và Mức độ quan trọng. Mục tiêu là dành nhiều thời gian hơn cho ô "Quan trọng & Không khẩn cấp" - nơi diễn ra các hoạt động chiến lược và phòng ngừa.</p>
+                                 <div style={styles.twoColumnLayout}>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Không gian làm việc của bạn</h4>
+                                        <div style={styles.matrixInputContainer}>
+                                           <input type="text" value={newTask} onChange={e => setNewTask(e.target.value)} placeholder="Thêm công việc của bạn..." style={styles.inputField} />
+                                           <button onClick={handleAddTask} style={styles.button}><PlusIcon/> Thêm</button>
+                                        </div>
+                                        <div style={styles.matrixContainer}>
+                                            <div style={styles.matrixQuadrant} onDragOver={e=>e.preventDefault()} onDrop={(e)=>moveTask(e, 'q1')}><h5>Làm ngay</h5>{matrixTasks.q1.map(t=><div key={t.id} style={styles.matrixTask} draggable onDragStart={e=>handleDragStart(e, t, 'q1')}>{t.text}</div>)}</div>
+                                            <div style={styles.matrixQuadrant} onDragOver={e=>e.preventDefault()} onDrop={(e)=>moveTask(e, 'q2')}><h5>Lên lịch</h5>{matrixTasks.q2.map(t=><div key={t.id} style={styles.matrixTask} draggable onDragStart={e=>handleDragStart(e, t, 'q2')}>{t.text}</div>)}</div>
+                                            <div style={styles.matrixQuadrant} onDragOver={e=>e.preventDefault()} onDrop={(e)=>moveTask(e, 'q3')}><h5>Ủy quyền</h5>{matrixTasks.q3.map(t=><div key={t.id} style={styles.matrixTask} draggable onDragStart={e=>handleDragStart(e, t, 'q3')}>{t.text}</div>)}</div>
+                                            <div style={styles.matrixQuadrant} onDragOver={e=>e.preventDefault()} onDrop={(e)=>moveTask(e, 'q4')}><h5>Loại bỏ</h5>{matrixTasks.q4.map(t=><div key={t.id} style={styles.matrixTask} draggable onDragStart={e=>handleDragStart(e, t, 'q4')}>{t.text}</div>)}</div>
+                                            <div style={styles.matrixNewTasks} onDragOver={e=>e.preventDefault()} onDrop={(e)=>moveTask(e, 'new')}><h5>Công việc mới (Kéo vào ma trận)</h5>{matrixTasks.new.map(t=><div key={t.id} style={styles.matrixTask} draggable onDragStart={e=>handleDragStart(e, t, 'new')}>{t.text}</div>)}</div>
+                                        </div>
+                                    </div>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Ví dụ minh họa</h4>
+                                        <div style={styles.matrixContainer}>
+                                            <div style={styles.exampleQuadrant}><h5>Làm ngay (Q & K)</h5><div style={styles.exampleTask}>Xử lý khiếu nại của khách hàng VIP</div><div style={styles.exampleTask}>Họp báo cáo sự cố hệ thống</div></div>
+                                            <div style={styles.exampleQuadrant}><h5>Lên lịch (Q & KK)</h5><div style={styles.exampleTask}>Lập kế hoạch đào tạo cho nhân viên mới</div><div style={styles.exampleTask}>Nghiên cứu đối thủ cạnh tranh</div><div style={styles.exampleTask}>Xây dựng Điều lệ Nhóm</div></div>
+                                            <div style={styles.exampleQuadrant}><h5>Ủy quyền (KQ & K)</h5><div style={styles.exampleTask}>Đặt vé máy bay cho chuyến công tác</div><div style={styles.exampleTask}>Tổng hợp số liệu báo cáo tuần</div></div>
+                                            <div style={styles.exampleQuadrant}><h5>Loại bỏ (KQ & KK)</h5><div style={styles.exampleTask}>Check mạng xã hội không mục đích</div><div style={styles.exampleTask}>Dự các cuộc họp không liên quan</div></div>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                        );
+                     case "WBS Builder":
+                         return (
+                            <div>
+                                <h3 style={styles.toolTitle}>WBS Builder: Cấu trúc Phân rã Công việc</h3>
+                                <p style={styles.paragraph}>Đừng để các mục tiêu lớn làm bạn choáng ngợp. WBS giúp "bẻ gãy" một mục tiêu thành các sản phẩm bàn giao (cấp 2) và các gói công việc cụ thể (cấp 3), tạo ra một lộ trình rõ ràng để thực thi.</p>
+                                <div style={styles.twoColumnLayout}>
+                                     <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Thực hành với mục tiêu của bạn</h4>
+                                        <div style={styles.wbsContainer}>
+                                            <label style={styles.label}>Mục tiêu (Cấp 1):</label>
+                                            <input type="text" placeholder="VD: Tăng tỷ lệ giữ chân khách hàng" value={wbs.objective} onChange={e => handleWbsChange('objective', e.target.value)} style={styles.inputFieldFull} />
+                                            {wbs.deliverables.map(d => (
+                                                <div key={d.id} style={styles.wbsDeliverable}>
+                                                    <label style={styles.label}>Sản phẩm bàn giao (Cấp 2):</label>
+                                                    <input type="text" placeholder="VD: Cải thiện quy trình chăm sóc khách hàng" value={d.title} onChange={e => handleWbsChange('deliverableTitle', e.target.value, d.id)} style={styles.inputFieldFull} />
+                                                    <div style={styles.wbsPackages}>
+                                                        <label style={styles.label}>Gói công việc (Cấp 3):</label>
+                                                        {d.packages.map((p, i) => (
+                                                            <input key={i} type="text" placeholder="VD: Khảo sát mức độ hài lòng của khách hàng" value={p} onChange={e => handleWbsChange('package', e.target.value, d.id, i)} style={styles.inputFieldFull} />
+                                                        ))}
+                                                        <button onClick={() => addPackage(d.id)} style={styles.buttonSmall}><PlusIcon/> Thêm gói công việc</button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <button onClick={addDeliverable} style={{...styles.button, marginTop: '15px'}}><PlusIcon/> Thêm sản phẩm bàn giao</button>
+                                        </div>
+                                    </div>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Ví dụ: Giảm thời gian giải quyết bồi thường</h4>
+                                        <div style={styles.wbsContainer}>
+                                            <p><strong>Cấp 1:</strong> Giảm thời gian giải quyết bồi thường từ 15 xuống 10 ngày</p>
+                                            <div style={styles.wbsDeliverable}>
+                                                <p><strong>Cấp 2:</strong> Tối ưu hóa Quy trình Tiếp nhận Hồ sơ</p>
+                                                <div style={styles.wbsPackages}>
+                                                   <div style={styles.exampleWbsPackage}>Vẽ sơ đồ luồng công việc tiếp nhận hiện tại</div>
+                                                   <div style={styles.exampleWbsPackage}>Phỏng vấn 5 nhân viên để xác định điểm nghẽn</div>
+                                                   <div style={styles.exampleWbsPackage}>Thử nghiệm biểu mẫu khai báo kỹ thuật số mới</div>
+                                                </div>
+                                            </div>
+                                            <div style={styles.wbsDeliverable}>
+                                                <p><strong>Cấp 2:</strong> Tăng cường Giao tiếp giữa các Phòng ban</p>
+                                                <div style={styles.wbsPackages}>
+                                                   <div style={styles.exampleWbsPackage}>Tổ chức họp hàng tuần giữa Bồi thường và Pháp chế</div>
+                                                   <div style={styles.exampleWbsPackage}>Tạo kênh chat chung cho các ca phức tạp</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         );
+                    case "Phân Tích 5 Whys":
+                        return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Phân Tích 5 Whys: Tìm ra Nguyên nhân Gốc rễ</h3>
+                                <p style={styles.paragraph}>Thay vì chỉ giải quyết triệu chứng, hãy hỏi "Tại sao?" lặp đi lặp lại để tìm ra nguyên nhân cốt lõi của vấn đề. Khi giải quyết được gốc rễ, vấn đề sẽ không tái diễn.</p>
+                                 <div style={styles.twoColumnLayout}>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Phân tích vấn đề của bạn</h4>
+                                        <label style={styles.label}>Vấn đề:</label>
+                                        <input type="text" placeholder="VD: Tỷ lệ từ chối bồi thường cao" value={problem} onChange={e => setProblem(e.target.value)} style={styles.inputFieldFull} />
+                                        {fiveWhys.map((why, index) => (
+                                             <div key={index} style={{marginTop: '15px'}}>
+                                                <label style={styles.label}>Tại sao {index + 1}?</label>
+                                                <input type="text" value={why} onChange={e => handleWhyChange(index, e.target.value)} disabled={index > 0 && fiveWhys[index - 1] === ""} style={styles.inputFieldFull} />
+                                             </div>
+                                        ))}
+                                        {fiveWhys[4] && <div style={styles.rootCauseResult}><strong>Nguyên nhân gốc rễ (dự đoán):</strong> {fiveWhys[4]}</div>}
+                                    </div>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Ví dụ: Báo cáo tuần luôn nộp trễ</h4>
+                                        <p><strong>Vấn đề:</strong> Báo cáo tuần luôn nộp trễ.</p>
+                                        <div style={styles.exampleWhy}><strong>Tại sao 1?</strong> Vì mất nhiều thời gian để tổng hợp số liệu.</div>
+                                        <div style={styles.exampleWhy}><strong>Tại sao 2?</strong> Vì số liệu nằm ở 3 hệ thống khác nhau.</div>
+                                        <div style={styles.exampleWhy}><strong>Tại sao 3?</strong> Vì các hệ thống không được tích hợp với nhau.</div>
+                                        <div style={styles.exampleWhy}><strong>Tại sao 4?</strong> Vì yêu cầu tích hợp không nằm trong phạm vi dự án ban đầu.</div>
+                                        <div style={styles.exampleWhy}><strong>Tại sao 5?</strong> Vì bộ phận yêu cầu đã không lường trước được nhu cầu báo cáo trong giai đoạn lập kế hoạch dự án.</div>
+                                        <div style={styles.rootCauseResult}><strong>Nguyên nhân gốc rễ:</strong> Lỗi trong khâu lập kế hoạch dự án hệ thống.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    case "La Bàn SLII®":
+                         return (
+                            <div>
+                                <h3 style={styles.toolTitle}>La Bàn SLII®: Chẩn đoán Phong cách Lãnh đạo</h3>
+                                <p style={styles.paragraph}>Lãnh đạo hiệu quả là sự linh hoạt. Công cụ này giúp bạn chẩn đoán mức độ phát triển của nhân viên đối với một nhiệm vụ cụ thể để áp dụng phong cách lãnh đạo phù hợp, tránh việc quản lý vi mô người giỏi hoặc bỏ rơi người mới.</p>
+                                <div style={styles.sl2Grid}>
+                                    <div style={styles.sl2Controls}>
+                                        <div>
+                                            <label style={styles.label}>Năng lực (Kiến thức & Kỹ năng)</label>
+                                             <p style={styles.smallText}>Nhân viên có đủ kỹ năng và kinh nghiệm để thực hiện nhiệm vụ này không?</p>
+                                            <div style={styles.sliderContainer}><span style={styles.sliderLabel}>Thấp</span><input type="range" min="1" max="4" value={sl2.competence} onChange={e => setSl2(prev => ({ ...prev, competence: parseInt(e.target.value) }))} style={styles.slider}/><span style={styles.sliderLabel}>Cao</span></div>
+                                        </div>
+                                        <div>
+                                            <label style={styles.label}>Cam kết (Động lực & Tự tin)</label>
+                                            <p style={styles.smallText}>Nhân viên có hào hứng, tự tin và chủ động với nhiệm vụ này không?</p>
+                                            <div style={styles.sliderContainer}><span style={styles.sliderLabel}>Thấp</span><input type="range" min="1" max="4" value={sl2.commitment} onChange={e => setSl2(prev => ({ ...prev, commitment: parseInt(e.target.value) }))} style={styles.slider}/><span style={styles.sliderLabel}>Cao</span></div>
+                                        </div>
+                                    </div>
+                                    <div style={styles.sl2Result}>
+                                         <h4>Chẩn đoán & Hành động</h4>
+                                         <p><strong>Mức độ phát triển:</strong> {sl2Result.level} - {sl2Result.name}</p>
+                                         <p><strong>Phong cách lãnh đạo đề xuất:</strong> <span style={styles.sl2Style}>{sl2Result.style}</span></p>
+                                         <p><strong>Hành động chính:</strong> {sl2Result.desc}</p>
+                                    </div>
+                                </div>
+                            </div>
+                         );
+                    case "Checklist Phản Hồi SBI":
+                         return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Checklist Phản Hồi SBI</h3>
+                                <p style={styles.paragraph}>Đưa ra phản hồi là một kỹ năng. Mô hình SBI (Tình huống - Hành vi - Tác động) giúp bạn cấu trúc cuộc hội thoại, tập trung vào sự thật quan sát được, giảm sự phòng thủ và tăng tính xây dựng.</p>
+                                <div style={styles.twoColumnLayout}>
+                                     <div style={styles.column}>
+                                         <h4 style={styles.subHeader}>Soạn kịch bản của bạn</h4>
+                                        <label style={styles.label}>S (Situation - Tình huống):</label>
+                                        <textarea placeholder="Khi nào và ở đâu? VD: Trong cuộc họp sáng nay với khách hàng X..." value={sbi.situation} onChange={e => handleSbiChange('situation', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                        <label style={styles.label}>B (Behavior - Hành vi):</label>
+                                        <textarea placeholder="Hành vi CỤ THỂ, QUAN SÁT ĐƯỢC. VD: Tôi quan sát thấy bạn ngắt lời khách hàng 3 lần..." value={sbi.behavior} onChange={e => handleSbiChange('behavior', e.target.value)} style={styles.textareaField} rows="4"></textarea>
+                                        <label style={styles.label}>I (Impact - Tác động):</label>
+                                        <textarea placeholder="Tác động của hành vi đó lên bạn/đội/khách hàng. VD: Điều này khiến tôi lo lắng rằng chúng ta có thể bỏ lỡ thông tin quan trọng..." value={sbi.impact} onChange={e => handleSbiChange('impact', e.target.value)} style={styles.textareaField} rows="4"></textarea>
+                                    </div>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Ví dụ & Kịch bản gợi ý</h4>
+                                        <div style={styles.sbiPreview}>
+                                             <p><strong>Tình huống:</strong> Nhân viên nộp báo cáo có nhiều sai sót.</p>
+                                            <p><strong>Kịch bản mẫu:</strong> "Khi tôi xem lại bản báo cáo chị gửi sáng nay về kết quả kinh doanh quý (S), tôi nhận thấy có một vài số liệu ở trang 2 và 3 chưa khớp với dữ liệu trên hệ thống (B). Tác động của việc này là chúng ta cần thêm thời gian để kiểm tra lại trước khi gửi cho ban giám đốc (I)."</p>
+                                             <p style={styles.previewSeparator}>---</p>
+                                            <p><strong>Kịch bản của bạn:</strong></p>
+                                            <p>"{sbi.situation || '(Tình huống)'}, {sbi.behavior || '(hành vi)'}. {sbi.impact || '(tác động)'}."</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         );
+                    case "Điều Lệ Nhóm":
+                         return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Soạn thảo Điều Lệ Nhóm</h3>
+                                <p style={styles.paragraph}>Điều lệ Nhóm là một "bản hiến pháp" do cả đội cùng xây dựng. Nó không phải văn bản của sếp, mà là thỏa thuận chung về cách chúng ta làm việc và ứng xử với nhau để đạt mục tiêu chung.</p>
+                                <div style={styles.twoColumnLayout}>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Điều lệ của nhóm bạn</h4>
+                                         <div style={styles.charterContainer}>
+                                            <label style={styles.label}>1. Mục đích & Mục tiêu</label>
+                                            <textarea placeholder="Đóng góp của chúng ta cho OPES là gì?..." value={teamCharter.purpose} onChange={e => handleCharterChange('purpose', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                             <label style={styles.label}>2. Vai trò & Trách nhiệm</label>
+                                            <textarea placeholder="Ai chịu trách nhiệm chính cho việc X?..." value={teamCharter.roles} onChange={e => handleCharterChange('roles', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                             <label style={styles.label}>3. Giá trị & Quy tắc</label>
+                                            <textarea placeholder="VD: Chúng ta thách thức ý tưởng, không thách thức con người..." value={teamCharter.values} onChange={e => handleCharterChange('values', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                             <label style={styles.label}>4. Quy ước Giao tiếp</label>
+                                            <textarea placeholder="Thời gian phản hồi email mong đợi?..." value={teamCharter.communication} onChange={e => handleCharterChange('communication', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                             <label style={styles.label}>5. Quy trình Giải quyết Xung đột</label>
+                                            <textarea placeholder="Khi có bất đồng, quy trình thống nhất là gì?..." value={teamCharter.conflict} onChange={e => handleCharterChange('conflict', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Ví dụ: Đội Thẩm định Rủi ro Alpha</h4>
+                                        <div style={styles.charterContainer}>
+                                            <p><strong>1. Mục đích:</strong> Là lá chắn vững chắc, đảm bảo sự tăng trưởng bền vững cho OPES thông qua việc thẩm định rủi ro chính xác và hiệu quả.</p>
+                                            <p><strong>2. Vai trò:</strong> Trưởng nhóm là người ra quyết định cuối cùng cho các ca trên 5 tỷ. Mọi thành viên có quyền phê duyệt các ca dưới 500 triệu.</p>
+                                            <p><strong>3. Quy tắc:</strong> "Dữ liệu nói thay lời nói." "Thừa nhận sai lầm sớm là một sức mạnh." "Mọi quy trình đều có thể được cải tiến."</p>
+                                            <p><strong>4. Giao tiếp:</strong> Email nội bộ phản hồi trong 24h. Các vấn đề khẩn cấp được trao đổi qua Teams. Họp team vào 9h sáng thứ Hai hàng tuần.</p>
+                                            <p><strong>5. Xung đột:</strong> Khi có bất đồng giữa kinh doanh và thẩm định, hai bên sẽ có một cuộc họp 15 phút để trình bày luận điểm. Nếu không giải quyết được, sẽ leo thang lên trưởng nhóm.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         );
+                    case "Kế hoạch Hành động 30-60-90":
+                        return (
+                            <div>
+                                <h3 style={styles.toolTitle}>Xây dựng Kế hoạch Hành động 30-60-90</h3>
+                                <p style={styles.paragraph}>Kiến thức chỉ trở thành kỹ năng khi được thực hành. Hãy biến những gì đã học thành một kế hoạch hành động cụ thể để tạo ra sự thay đổi bền vững cho bạn và đội nhóm.</p>
+                                 <div style={styles.twoColumnLayout}>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Kế hoạch của bạn</h4>
+                                        <div style={styles.planGrid}>
+                                            {Object.keys(actionPlan).map(period => (
+                                                <div key={period} style={styles.planPeriod}>
+                                                    <h5>{period} NGÀY TỚI</h5>
+                                                    <label style={styles.label}>Mục tiêu chính:</label>
+                                                    <input type="text" value={actionPlan[period].goal} onChange={e => handlePlanChange(period, 'goal', e.target.value)} style={styles.inputFieldFull}/>
+                                                    <label style={styles.label}>Hành động cụ thể:</label>
+                                                    <textarea value={actionPlan[period].actions} onChange={e => handlePlanChange(period, 'actions', e.target.value)} style={styles.textareaField} rows="3"></textarea>
+                                                    <label style={styles.label}>Thước đo thành công:</label>
+                                                     <input type="text" value={actionPlan[period].metric} onChange={e => handlePlanChange(period, 'metric', e.target.value)} style={styles.inputFieldFull}/>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button style={{...styles.button, marginTop: '20px'}} onClick={() => alert("Chức năng chia sẻ đang được phát triển!")}>Chia sẻ với Quản lý</button>
+                                    </div>
+                                    <div style={styles.column}>
+                                        <h4 style={styles.subHeader}>Ví dụ tham khảo</h4>
+                                        <div style={styles.planGrid}>
+                                            <div style={styles.planPeriod}>
+                                                <h5>30 NGÀY</h5>
+                                                <p><strong>Mục tiêu:</strong> Làm chủ hiệu suất cá nhân.</p>
+                                                <p><strong>Hành động:</strong> Phân loại công việc bằng Ma trận Eisenhower mỗi sáng. Áp dụng Time Blocking, dành 90 phút/ngày cho công việc chuyên sâu.</p>
+                                                <p><strong>Thước đo:</strong> Hoàn thành 100% công việc trong ô "Quan trọng & Khẩn cấp" mỗi tuần.</p>
+                                            </div>
+                                             <div style={styles.planPeriod}>
+                                                <h5>60 NGÀY</h5>
+                                                <p><strong>Mục tiêu:</strong> Nâng cao kỹ năng phản hồi.</p>
+                                                <p><strong>Hành động:</strong> Thực hiện ít nhất 1 cuộc hội thoại phản hồi theo mô hình SBI cho mỗi thành viên trong đội (5 người).</p>
+                                                <p><strong>Thước đo:</strong> Ghi chép lại 5 cuộc hội thoại SBI đã thực hiện.</p>
+                                            </div>
+                                             <div style={styles.planPeriod}>
+                                                <h5>90 NGÀY</h5>
+                                                <p><strong>Mục tiêu:</strong> Xây dựng nền tảng đội nhóm.</p>
+                                                <p><strong>Hành động:</strong> Tổ chức một buổi làm việc 2 giờ để cùng đội xây dựng bản Điều lệ Nhóm.</p>
+                                                <p><strong>Thước đo:</strong> Bản Điều lệ Nhóm được hoàn thiện và thống nhất bởi cả đội.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    default: return <div>Chọn một công cụ</div>;
+                }
+            };
+
+            return (
+                 <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+                    <div style={styles.cockpit}>
+                        <aside style={styles.sidebar}>
+                             <div style={styles.sidebarHeader}>
+                                <h1 style={styles.programTitle}>Learner Toolkit</h1>
+                                <p style={styles.programSubtitle}>Bộ Công Cụ Học Viên</p>
+                            </div>
+                            <nav style={styles.agendaNav}>
+                                {tools.map((tool) => (
+                                     <div key={tool} onClick={() => setActiveTool(tool)} style={{ ...styles.agendaItem, ...(tool === activeTool ? styles.activeAgendaItem : {}) }}>
+                                         <span style={styles.checkIcon}>{activeTool === tool && <CheckIcon />}</span>
+                                        <span style={styles.moduleTitle}>{tool}</span>
+                                    </div>
+                                ))}
+                            </nav>
+                        </aside>
+                        <main style={styles.mainContent}>
+                             <div style={styles.contentBody}>{renderActiveTool()}</div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Styles object ---
+        const styles = {
+            cockpit: { fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', display: 'flex', flex: 1, backgroundColor: '#111827', color: '#E5E7EB', overflow: 'hidden' },
+            sidebar: { width: '400px', backgroundColor: '#1F2937', display: 'flex', flexDirection: 'column', borderRight: '1px solid #374151' },
+            sidebarHeader: { padding: '24px', borderBottom: '1px solid #374151' },
+            programTitle: { fontSize: '24px', fontWeight: 'bold', margin: '0 0 4px 0', color: '#FFFFFF' },
+            programSubtitle: { fontSize: '14px', margin: 0, color: '#9CA3AF', letterSpacing: '0.5px' },
+            agendaNav: { flex: 1, overflowY: 'auto' },
+            agendaItem: { display: 'flex', alignItems: 'center', padding: '16px 24px', cursor: 'pointer', borderBottom: '1px solid #374151', transition: 'background-color 0.2s ease-in-out' },
+            activeAgendaItem: { backgroundColor: '#3B82F6', color: 'white' },
+            checkIcon: { marginRight: '12px', width: '16px', height: '16px' },
+            moduleTitle: { fontSize: '15px', fontWeight: '500' },
+            mainContent: { flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#111827' },
+            contentBody: { flex: 1, padding: '32px', overflowY: 'auto' },
+            paragraph: { fontSize: '15px', lineHeight: 1.7, margin: '0 0 12px 0', color: '#D1D5DB' },
+            smallText: { fontSize: '13px', lineHeight: 1.5, margin: '4px 0 8px 0', color: '#9CA3AF' },
+            toolTitle: { fontSize: '24px', fontWeight: 'bold', color: '#FFFFFF', marginBottom: '8px'},
+            subHeader: { fontSize: '18px', fontWeight: '600', color: '#E5E7EB', marginBottom: '16px', borderBottom: '1px solid #374151', paddingBottom: '8px'},
+            sliderContainer: { display: 'flex', alignItems: 'center', gap: '16px', margin: '12px 0'},
+            slider: { flex: 1, cursor: 'pointer', appearance: 'none', height: '8px', background: '#4B5563', borderRadius: '5px', outline: 'none' },
+            sliderLabel: { color: '#9CA3AF', fontStyle: 'italic', fontSize: '14px'},
+            sliderValue: { textAlign: 'center', fontSize: '18px', fontWeight: '600', color: '#3B82F6', marginTop: '10px'},
+            caseStudySection: { marginTop: '48px', borderTop: '1px solid #374151', paddingTop: '24px'},
+            caseStudyHeader: { fontSize: '20px', fontWeight: '600', color: '#FFFFFF', marginBottom: '16px'},
+            caseStudyTabs: { display: 'flex', gap: '8px', marginBottom: '16px', borderBottom: '1px solid #374151'},
+            caseStudyTab: { background: 'none', border: 'none', color: '#9CA3AF', padding: '12px 16px', cursor: 'pointer', borderBottom: '2px solid transparent', fontWeight: '500'},
+            caseStudyTabActive: { background: 'none', border: 'none', color: '#3B82F6', padding: '12px 16px', cursor: 'pointer', borderBottom: '2px solid #3B82F6', fontWeight: '600'},
+            caseStudyContent: { backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px' },
+            caseStudyScenario: { fontStyle: 'italic', color: '#E5E7EB', borderLeft: '3px solid #3B82F6', paddingLeft: '12px', marginBottom: '20px'},
+            caseStudyColumns: { display: 'flex', gap: '20px'},
+            caseStudyColumn: { flex: 1, borderTop: '1px solid #374151', paddingTop: '12px'},
+            columnTitle: { fontSize: '16px', color: '#FFFFFF', marginBottom: '8px'},
+            inputField: { background: '#374151', border: '1px solid #4B5563', color: '#E5E7EB', padding: '10px 14px', borderRadius: '6px', fontSize: '15px', flex: 1 },
+            inputFieldFull: { display: 'block', width: '100%', boxSizing: 'border-box', background: '#374151', border: '1px solid #4B5563', color: '#E5E7EB', padding: '10px 14px', borderRadius: '6px', fontSize: '15px', marginBottom: '10px' },
+            textareaField: { display: 'block', width: '100%', boxSizing: 'border-box', background: '#374151', border: '1px solid #4B5563', color: '#E5E7EB', padding: '10px 14px', borderRadius: '6px', fontSize: '15px', fontFamily: 'inherit', marginBottom: '10px'},
+            button: { display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#3B82F6', border: 'none', color: 'white', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' },
+            buttonSmall: { display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#374151', border: 'none', color: '#D1D5DB', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '500' },
+            label: { display: 'block', marginBottom: '6px', fontSize: '14px', color: '#9CA3AF', fontWeight: '500'},
+            twoColumnLayout: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' },
+            column: {},
+            matrixInputContainer: { display: 'flex', gap: '10px', marginBottom: '16px' },
+            matrixContainer: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' },
+            matrixQuadrant: { backgroundColor: '#1F2937', padding: '10px', borderRadius: '8px', border: '1px dashed #4B5563', minHeight: '150px' },
+            matrixNewTasks: { gridColumn: '1 / 3', backgroundColor: '#1F2937', padding: '10px', borderRadius: '8px', border: '1px dashed #4B5563', minHeight: '100px' },
+            matrixTask: { backgroundColor: '#374151', padding: '8px 12px', borderRadius: '4px', marginBottom: '8px', cursor: 'grab' },
+            exampleQuadrant: { backgroundColor: '#1F2937', padding: '10px', borderRadius: '8px' },
+            exampleTask: { backgroundColor: '#374151', padding: '8px 12px', borderRadius: '4px', marginBottom: '8px', fontSize: '14px' },
+            rootCauseResult: { marginTop: '20px', padding: '15px', backgroundColor: '#1E40AF', borderRadius: '8px', border: '1px solid #3B82F6', fontWeight: 'bold' },
+            exampleWhy: { borderLeft: '2px solid #4B5563', paddingLeft: '10px', marginTop: '10px' },
+            planGrid: { display: 'flex', flexDirection: 'column', gap: '20px' },
+            planPeriod: { backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px' },
+            wbsContainer: { backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px' },
+            wbsDeliverable: { borderTop: '1px solid #374151', paddingTop: '15px', marginTop: '15px' },
+            wbsPackages: { marginLeft: '20px', borderLeft: '2px solid #374151', paddingLeft: '20px', marginTop: '10px' },
+            exampleWbsPackage: { backgroundColor: '#374151', padding: '8px 12px', borderRadius: '4px', marginBottom: '8px', fontSize: '14px' },
+            sl2Grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', alignItems: 'center', backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px' },
+            sl2Controls: {},
+            sl2Result: { borderLeft: '2px solid #3B82F6', paddingLeft: '20px' },
+            sl2Style: { color: '#3B82F6', fontWeight: 'bold', backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '4px 8px', borderRadius: '4px'},
+            sbiPreview: { backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px', border: '1px dashed #4B5563' },
+            previewSeparator: { borderTop: '1px dashed #4B5563', margin: '15px 0' },
+            charterContainer: { backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px' },
+            emotionSelector: { display: 'flex', justifyContent: 'space-around', gap: '10px', margin: '20px 0', backgroundColor: '#1F2937', padding: '20px', borderRadius: '8px' },
+            emotionButton: { background: '#374151', border: '1px solid #4B5563', color: '#E5E7EB', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flex: 1, transition: 'all 0.2s ease'},
+            emotionEmoji: { fontSize: '2.5rem' },
+            emotionLogContainer: { marginTop: '30px' },
+            emotionLogItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#1F2937', padding: '12px 16px', borderRadius: '6px', marginBottom: '8px' },
+            emotionLogTimestamp: { fontSize: '13px', color: '#9CA3AF' }
+        };
+
+        // --- Render the app ---
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<LearnerToolkit />);
+    </script>
+</body>
+</html>
+
